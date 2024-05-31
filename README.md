@@ -1,4 +1,4 @@
-# life_expectancy
+# Life Expectancy Regression Models
 
 This project aims to predict life expectancy using advanced regression models, emphasizing practical deployment strategies and scalability to provide actionable insights into factors influencing life expectancy globally.
 
@@ -11,20 +11,22 @@ This project aims to predict life expectancy using advanced regression models, e
    - [Feature Creation](#feature-creation)
    - [Normal Distribution Checking](#normal-distribution-checking)
    - [Correlation Check](#correlation-check)
-   - [WOE Transformation](#woe-transformation)
+   - [Scaling](#scaling)
 4. [Train Test Splitting](#train-test-splitting)
 5. [Model Building](#model-building)
 6. [Model Optimization](#model-optimization)
-7. [Stacking Classifier](#stacking-classifier)
+7. [Stacking Regressor](#stacking-regressor)
 8. [Univariate Analysis](#univariate-analysis)
 
 ## Data Import
 
-The dataset used in this project contains information on whether clients defaulted on their credit card payments. It consists of 30,000 rows and 24 features, along with 1 target column, which is the default column. We have checked the data in terms of statistics using the `describe` command. Finally, the meanings of each columns have been placed in the excel file (second sheet).
+The dataset used contains demographic, socioeconomic, and health-related indicators from various countries, with life expectancy as the target variable. It consists of 2938 rows and 21 features, along with 1 target column, which is the Life expectancy column. We have checked the data in terms of statistics using the `describe` command. Finally, the meanings of each columns have been placed in the excel file (second sheet).
 
 ## Preprocessing Steps
 
 ### Filling Null Values
+
+Missing values in the dataset were filled using appropriate methods such as mean for numeric columns and mode for categoric columns based on feature distributions.
 
 ### Outlier Treatment (Capping method)
 
@@ -32,11 +34,11 @@ Outliers in the dataset were treated using the capping method. The interquartile
 
 ### Feature Creation
 
-New features were created to enhance the predictive power of the model by leveraging the relationships between existing features. Specifically, statistical analysis was used to create new columns based on the relationships between `EDUCATION` and `LIMIT_BAL`, as well as `MARRIAGE` and `LIMIT_BAL`.
+New columns are created to explore the relationship between 'Status' and 'infant deaths' using various statistical measures. The code iterates through predefined statistical methods (`statistics`) to compute aggregates of 'infant deaths' grouped by 'Status'. Resulting columns are appended to the dataset to capture these relationships.
 
-For each category in `EDUCATION`, new columns were created to capture the mean, sum, minimum, and maximum values of `LIMIT_BAL`. This was done by grouping the data by `EDUCATION` and calculating these statistics, which were then merged back into the main dataset.
+Similarly, new columns are generated to analyze the association between 'Status' and 'Total expenditure' using statistical measures defined in `statistics`. This process enhances the dataset by incorporating insights into how 'Total expenditure' varies across different 'Status' categories.
 
-Similarly, new columns were created for each category in `MARRIAGE`, capturing the mean, sum, minimum, and maximum values of `LIMIT_BAL` by grouping the data by `MARRIAGE` and performing the same statistical calculations. These new features provide additional insights into the relationships between these variables, which can improve the model's performance.
+These engineered features aim to enrich predictive models by encapsulating significant relationships between predictors and 'Status', contributing to a more nuanced understanding of factors influencing life expectancy.
 
 ### Normal Distribution Checking
 
@@ -53,7 +55,7 @@ This approach ensures that appropriate statistical methods are used depending on
 In this project, two types of correlation analyses were conducted: target correlation and intercorrelation among features.
 
 **Target Correlation:** 
-Target correlation assesses the relationship between each feature and the target variable (`default` in this case). Features with an absolute correlation coefficient of 10% or higher with the target are considered to have a significant influence on predicting credit card defaults.
+Target correlation assesses the relationship between each feature and the target variable (`Life expectancy` in this case). Features with an absolute correlation coefficient of 40% or higher with the target are considered to have a significant influence on predicting life expectancy.
 
 **Intercorrelation Among Features:** 
 Intercorrelation examines relationships between pairs of features in the dataset. Features with intercorrelation coefficients of 80% or higher are considered highly correlated. Managing such high intercorrelation helps prevent multicollinearity, ensuring that the model remains robust and interpretable.
@@ -66,51 +68,35 @@ Based on these analyses, several key features were chosen for further modeling a
 
 This comprehensive approach ensures that the model effectively captures relevant relationships while mitigating issues related to multicollinearity.
 
-### WOE Transformation
+### Scaling
 
-WOE transformation plays a crucial role in transforming categorical variables into a form that is more suitable for predictive modeling. Here's how it's implemented:
-
-**Numeric Values:**
-- Numerical features are binned based on quartiles (q1, q2, q3).
-- Each bin is assigned a category, and WOE values are calculated to capture the relationship between the feature and default status.
-- This transformation helps in identifying how each numerical feature contributes to predicting credit card defaults.
-
-**Categorical Values:**
-- Categorical features are grouped by their unique values.
-- WOE values are computed to quantify the predictive strength of each category in relation to credit card default.
-- Missing values and categories with sparse data are handled to ensure robust WOE transformation.
+Standard scaler used for bringing features to the same range for better performance.
 
 ## Train Test Splitting
 
-The dataset is split into training and testing sets to evaluate the performance of the models. Here I have taken 3 inputs depending on the models: Logistic Regression inputs, Catboost custom model inputs declaring categoric features, and inputs for other models.
+The dataset is split into training and testing sets to evaluate the performance of the models. Here I have taken 3 inputs depending on the models: Linear Regression inputs, Catboost custom model inputs declaring categoric features, and inputs for other models.
 
 ## Model Building
 
-Several classification models are built to predict the likelihood of credit card defaults, including logistic regression, decision trees, and random forests. Since the dataset is imbalanced, we have to look through gini probabilities, and result is here:
-
-![image](https://github.com/yrovsen/default_credit_card/assets/137065696/405bf9cb-d342-4a16-b92d-4113c253cc04)
+Several Regression models are built to predict the life expectancy, including linear regression, random forest regressor, SVR and so on. In order to observe overfitting in models, both train and test R2 scores have been shown for all models in one dataframe.
 
 
 ## Model Optimization
 
 Hyperparameters of the models are tuned using cross-validation techniques to achieve the best performance. Using optuna library, the models which has performed better has been tuned to get even more better results:
 
-![image](https://github.com/yrovsen/default_credit_card/assets/137065696/8f019e5d-4518-41d0-9383-3ebad2746c41)
+![image](https://github.com/yrovsen/life_expectancy/assets/137065696/8b9ea9a0-98e5-42d0-8d7a-1cb4ef67e5bc)
 
- 
-## Stacking Classifier
+## Stacking Regressor
 
-A stacking classifier is implemented to combine the predictions of multiple models and improve overall accuracy. As base models, xgboost and lightgbm tuned models, and as a meta model, default tuned catboost model have been used for stacking. However, stacking classifier gini score was below than catboost optuna model which was chosen for univariate analysis as a final model.
+A stacking classifier is implemented to combine the predictions of multiple models and improve overall accuracy. As base models, catboost default and lightgbm tuned models, and as a meta model, xgboost tuned model have been used for stacking. However, stacking regressor R2 score was below than xgboost optuna model which was chosen for univariate analysis as a final model.
 
 ## Univariate Analysis
 
-Univariate analysis is performed to understand the distribution and central tendency of individual features. The features which have test gini score more than 20% and are not overfitting chosen for fitting.
-
-![image](https://github.com/yrovsen/default_credit_card/assets/137065696/8762920c-e317-4d5d-89d3-31d722d282e4)
+Univariate analysis is performed to understand the distribution and central tendency of individual features. The features which have test r2_score more than 35% and are not overfitting chosen for fitting.
 
 ## Results and Conclusion
 
-The models are evaluated based on various metrics, and the best-performing model is identified. The project demonstrates the effectiveness of combining multiple preprocessing and modeling techniques to improve classification accuracy. Regardless of the fact that all models had good results, catboost tuned model has been chosen and using univariate analysis, main features filtered accordingly. Here is ROC&AUC curve and precision-recall trade off curve:
+The models are evaluated based on various metrics, and the best-performing model is identified. The project demonstrates the effectiveness of combining multiple preprocessing and modeling techniques to improve accuracy. Regardless of the fact that all models had good results, catboost tuned model has been chosen and using univariate analysis, main features filtered accordingly. Here is ROC&AUC curve and precision-recall trade off curve:
+![image](https://github.com/yrovsen/life_expectancy/assets/137065696/1af34e5b-07a6-46dc-8699-671aa27b31cc)
 
-![image](https://github.com/yrovsen/default_credit_card/assets/137065696/66077329-0aab-441f-94f0-a7014d5f5ad6) 
-![image](https://github.com/yrovsen/default_credit_card/assets/137065696/2e2e40e2-5939-447d-81e1-71f8defab284)
