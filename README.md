@@ -97,6 +97,8 @@ Univariate analysis is performed to understand the distribution and central tend
 
 ## Results and Conclusion
 
-The models are evaluated based on various metrics, and the best-performing model is identified. The project demonstrates the effectiveness of combining multiple preprocessing and modeling techniques to improve accuracy. Regardless of the fact that all models had good results, catboost tuned model has been chosen and using univariate analysis, main features filtered accordingly. Here is ROC&AUC curve and precision-recall trade off curve:
+The models are evaluated based on various metrics, and the best-performing model is identified. The project demonstrates the effectiveness of combining multiple preprocessing and modeling techniques to improve accuracy. Regardless of the fact that all models had good results, catboost tuned model has been chosen and using univariate analysis, main features filtered accordingly.
+
+
 ![image](https://github.com/yrovsen/life_expectancy/assets/137065696/1af34e5b-07a6-46dc-8699-671aa27b31cc)
 
